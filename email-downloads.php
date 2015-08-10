@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Email Downloads
  * Plugin URI: http://nanodesignsbd.com/
- * Description: Embed a form in your pages and posts that accept an email address in exchange for a file download.
+ * Description: Embed a form in your pages and posts that accept an email address in exchange for a file to download. The plugin is simpler, quicker, with minimal database usage, and completely in WordPress' way.
  * Version: 1.0.0
  * Author: Mayeenul Islam (@mayeenulislam), Sisir Kanti Adhikari (@prionkor)
  * Author URI: http://nanodesignsbd.com/mayeenulislam/
@@ -62,8 +62,8 @@ function nanodesigns_email_downalods_shortcode( $atts ) {
             $unique_string  = $email . $file_path;
             $hash           = $hashprefix . md5( $unique_string );
 
-            //db storage - for 12 hours only
-            set_transient( $hash, $file_url, 60 ); //testing with 60 seconds only; Real: 12 * HOUR_IN_SECONDS
+            //db storage - for 12 hours only (12 * HOUR_IN_SECONDS) (P.S.: testing with 60 seconds only)
+            set_transient( $hash, $file_path, 60 );
 
             /**
              * Making the download link with parameter
