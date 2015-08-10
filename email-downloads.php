@@ -51,39 +51,53 @@ function nanodesigns_email_downalods_shortcode( $atts ) {
     $atts = shortcode_atts( array( 'file' => '' ), $atts );
     $file_path = $atts['file'];
 
+    //Error storage
+    $submission_error = array();
+
     if( isset( $_POST['download_submit'] ) ) {
 
         $email      = $_POST['download_email'];
 
-        if( $email && is_email( $email ) ) {
+        if( !empty( $email ) ) {
+            if( is_email( $email ) ) {
 
-            $hashprefix     = 'downlink_';
-            $ip_address     = nanodesigns_get_the_ip(); //grab the user's IP
-            $unique_string  = $email . $file_path;
-            $hash           = $hashprefix . md5( $unique_string );
+                $ip_address     = nanodesigns_get_the_ip(); //grab the user's IP
+                $unique_string  = $email . $ip_address . $file_path; //more complex unique string
+                $hash           = hash_hmac( 'md5', $unique_string, $ip_address ); //IP address is the key
 
-            //db storage - for 12 hours only (12 * HOUR_IN_SECONDS) (P.S.: testing with 60 seconds only)
-            set_transient( $hash, $file_path, 60 );
+                //db storage - for 12 hours only (12 * HOUR_IN_SECONDS) (P.S.: testing with 60 seconds only)
+                set_transient( $hash, $file_path, 60 );
 
-            /**
-             * Making the download link with parameter
-             * 'download_token' is important.
-             * @var string
-             */
-            $download_link  = esc_url( add_query_arg( 'download_token', $hash, site_url() ) );
+                /**
+                 * Making the download link with parameter
+                 * 'download_token' is important.
+                 * @var string
+                 */
+                $download_link  = esc_url( add_query_arg( 'download_token', $hash, site_url() ) );
 
-            //email the download link
-            nanodesigns_email_downloads( $email, $download_link );
+                //email the download link
+                nanodesigns_email_downloads( $email, $download_link );
+            } else {
+                $submission_error[] = __( 'Please enter a valid email address', 'email-downloads' );
+            }
+        } else {
+            $submission_error[] = __( 'Email Address cannot be empty', 'email-downloads' );
         }
 
+    }
+
+    if( !empty( $submission_error ) ) {
+        foreach( $submission_error as $error ){
+            echo '<p style="color: red;">'. __( '<strong>Error: </strong>', 'email-downloads' ) . $error .'</p>';
+        }
     }
 
     ob_start();
     ?>
     <div class="email-downloads">
         <form action="" enctype="multipart/form-data" method="post">
-            <p><?php _e( 'Enter your email address to download the file', 'email-downloads' ); ?></p>
-            <input type="email" name="download_email" id="download-email" value=""><br>
+            <p><label for="download-email"><?php _e( 'Enter your email address to download the file:', 'email-downloads' ); ?></label></p>
+            <p><input type="email" name="download_email" id="download-email" placeholder="type your email address here" value="<?php echo isset($_POST['download_email']) ? $_POST['download_email'] : ''; ?>" autocomple="off"></p>
             <button type="submit" name="download_submit"><?php _e( 'Send me the File', 'email-downloads' ); ?></button>
         </form>
     </div>
@@ -139,7 +153,7 @@ add_action( 'template_redirect', 'nanodesigns_let_the_user_download' );
  * ------------------------------------------------------------------------------
  */
 function nanodesigns_email_downloads( $email, $download_link ) {
-    if( $email && is_email($email) && $download_link ) :
+    if( $email && is_email( $email ) && $download_link ) :
         
         global $_sender, $_from_email;
 
@@ -176,10 +190,11 @@ function nanodesigns_email_downloads( $email, $download_link ) {
         //send the email
         $sent = wp_mail( $to_email, $subject, $message, $headers );
 
-        if( $sent )
+        if( $sent ) {
             _e( '<p>The download link is sent to your email address. Check your inbox please', 'email-downloads</p>' );
-        else
-            _e( 'Sorry, an error occured', 'email-downloads' );
+        } else {
+            printf( __( '<p>Sorry, an error occurred. Email cannot be sent.</p><p>You can try the following temporary link to download the file:<br><a href="%1$s" target="_blank" rel="nofollow">%1$s</a></p>', 'email-downloads' ), $download_link );
+        }
 
     endif;
 }
