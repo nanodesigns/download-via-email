@@ -4,7 +4,7 @@
  * Plugin URI: http://nanodesignsbd.com/
  * Description: Embed a form in your pages and posts that accept an email address in exchange for a file to download. The plugin is simpler, quicker, with minimal database usage, and completely in WordPress' way.
  * Version: 1.0.0
- * Author: Mayeenul Islam (@mayeenulislam), Sisir Kanti Adhikari (@prionkor)
+ * Author: Mayeenul Islam (@mayeenulislam)
  * Author URI: http://nanodesignsbd.com/mayeenulislam/
  * License: GNU General Public License v2.0
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -32,12 +32,21 @@ if( !defined( 'ABSPATH' ) ) exit;
 
 
 /**
- * Define the necessary data first
- * will be dynamic later
+ * Set basic settings on the activation of the plugin.
+ * @return void
+ * ------------------------------------------------------------------------------
  */
+function nanodesigns_email_downloads_activate() {
+    $admin_email = get_option( 'admin_email' );
+    $admin_user = get_user_by( 'email', $admin_email );
 
-$_sender = 'Mayeenul Islam';
-$_from_email = 'info@nanodesignsbd.com';
+    $ed_settings = array(
+            'ed_sender_email'   => $admin_email,
+            'ed_sender_name'    => $admin_user->display_name
+        );
+    update_option( 'email_downloads_settings', $ed_settings );
+}
+register_activation_hook( __FILE__, 'nanodesigns_email_downloads_activate' );
 
 
 /**
@@ -47,7 +56,7 @@ $_from_email = 'info@nanodesignsbd.com';
  * @return string       formatted form.
  * ------------------------------------------------------------------------------
  */
-function nanodesigns_email_downalods_shortcode( $atts ) {    
+function nanodesigns_email_downloads_shortcode( $atts ) {    
     $atts = shortcode_atts( array( 'file' => '' ), $atts );
     $file_path = $atts['file'];
 
@@ -94,17 +103,18 @@ function nanodesigns_email_downalods_shortcode( $atts ) {
 
     ob_start();
     ?>
+    <hr>
     <div class="email-downloads">
         <form action="" enctype="multipart/form-data" method="post">
-            <p><label for="download-email"><?php _e( 'Enter your email address to download the file:', 'email-downloads' ); ?></label></p>
-            <p><input type="email" name="download_email" id="download-email" placeholder="type your email address here" value="<?php echo isset($_POST['download_email']) ? $_POST['download_email'] : ''; ?>" autocomple="off"></p>
+            <p><label for="download-email"><?php _e( 'Enter your email address to download the file. An email will be sent to your email address with the download link.', 'email-downloads' ); ?></label></p>
+            <p><input type="email" name="download_email" id="download-email" placeholder="type your email address here" value="<?php echo isset($_POST['download_email']) ? $_POST['download_email'] : ''; ?>" autocomple="off" size="50"></p>
             <button type="submit" name="download_submit"><?php _e( 'Send me the File', 'email-downloads' ); ?></button>
         </form>
     </div>
     <?php
     return ob_get_clean();
 }
-add_shortcode( 'email-downloads', 'nanodesigns_email_downalods_shortcode' );
+add_shortcode( 'email-downloads', 'nanodesigns_email_downloads_shortcode' );
 
 
 /**
@@ -155,7 +165,10 @@ add_action( 'template_redirect', 'nanodesigns_let_the_user_download' );
 function nanodesigns_email_downloads( $email, $download_link ) {
     if( $email && is_email( $email ) && $download_link ) :
         
-        global $_sender, $_from_email;
+        //get basic settings options from 'options' table
+        $ed_options = get_option( 'email_downloads_settings' );
+        $_sender        = $ed_options['ed_sender_name'];
+        $_from_email    = $ed_options['ed_sender_email'];
 
         $to_email       = $email;
         $subject        = __( 'Download is ready!', 'email-downloads' );
@@ -191,7 +204,7 @@ function nanodesigns_email_downloads( $email, $download_link ) {
         $sent = wp_mail( $to_email, $subject, $message, $headers );
 
         if( $sent ) {
-            _e( '<p>The download link is sent to your email address. Check your inbox please', 'email-downloads</p>' );
+            _e( '<p>The download link is sent to your email address. Check your inbox please</p>', 'email-downloads' );
         } else {
             printf( __( '<p>Sorry, an error occurred. Email cannot be sent.</p><p>You can try the following temporary link to download the file:<br><a href="%1$s" target="_blank" rel="nofollow">%1$s</a></p>', 'email-downloads' ), $download_link );
         }
@@ -219,3 +232,9 @@ function nanodesigns_get_the_ip() {
         return $_SERVER["REMOTE_ADDR"];
     }
 }
+
+
+/**
+ * Plugin Options Page (Settings)
+ */
+require_once 'ed-options.php';
