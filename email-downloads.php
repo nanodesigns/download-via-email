@@ -74,8 +74,8 @@ function nanodesigns_email_downloads_shortcode( $atts ) {
                 $unique_string  = $email . $ip_address . $file_path; //more complex unique string
                 $hash           = hash_hmac( 'md5', $unique_string, $ip_address ); //IP address is the key
 
-                //db storage - for 12 hours only (12 * HOUR_IN_SECONDS) (P.S.: testing with 60 seconds only)
-                set_transient( $hash, $file_path, 60 );
+                //db storage - for 12 hours only
+                set_transient( $hash, $file_path, 12 * HOUR_IN_SECONDS );
 
                 /**
                  * Making the download link with parameter

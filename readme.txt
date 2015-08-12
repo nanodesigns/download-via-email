@@ -37,6 +37,10 @@ Yes, we do not believe in sending raw absolute URL of a file, so it's by core en
 
 Yes, the email is HTML formatted by default
 
+= For how long the link will be valid? =
+
+By default any link that is generated for an email address would be valid for 12 hours only
+
 == Screenshots ==
 
 1. **Email Downloads** - how it will look like at the front end
