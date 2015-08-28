@@ -30,6 +30,12 @@
 // let not call the files directly
 if( !defined( 'ABSPATH' ) ) exit;
 
+// define necessary variables
+$plugin_version = '1.0.0';
+
+global $plugin_db_version;
+$plugin_db_version = '1.0';
+
 
 /**
  * Set basic settings on the activation of the plugin.
@@ -37,14 +43,44 @@ if( !defined( 'ABSPATH' ) ) exit;
  * ------------------------------------------------------------------------------
  */
 function nanodesigns_email_downloads_activate() {
+
+	/**
+	 * Make a new table for storing email addresses
+	 * table: 'email_downloads'
+	 */
+    global $wpdb, $plugin_db_version;
+
+    $table_name = $wpdb->prefix . "email_downloads";
+    $charset_collate = $wpdb->get_charset_collate();
+
+    if( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) != $table_name ) {
+
+        $sql = "CREATE TABLE $table_name (
+                  id mediumint(9) NOT NULL AUTO_INCREMENT,
+                  email VARCHAR(100) DEFAULT '' NOT NULL,
+                  time datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+                  UNIQUE KEY id (id)
+                ) $charset_collate;";
+
+	    //reference to upgrade.php file
+	    require_once( ABSPATH .'wp-admin/includes/upgrade.php' );
+	    dbDelta( $sql );
+
+    }
+    add_option( 'email_downloads_db_version', $plugin_db_version );
+
+	/**
+	 * Add the necessary default settings to the 'options table'
+	 */
     $admin_email = get_option( 'admin_email' );
     $admin_user = get_user_by( 'email', $admin_email );
 
     $ed_settings = array(
             'ed_sender_email'   => $admin_email,
             'ed_sender_name'    => $admin_user->display_name
-        );
+        );    
     update_option( 'email_downloads_settings', $ed_settings );
+
 }
 register_activation_hook( __FILE__, 'nanodesigns_email_downloads_activate' );
 
@@ -86,6 +122,9 @@ function nanodesigns_email_downloads_shortcode( $atts ) {
 
                 //email the download link
                 nanodesigns_email_downloads( $email, $download_link );
+
+                //store the email into our database
+                nanodesigns_store_emails( $email );
             } else {
                 $submission_error[] = __( 'Please enter a valid email address', 'email-downloads' );
             }
@@ -210,6 +249,28 @@ function nanodesigns_email_downloads( $email, $download_link ) {
         }
 
     endif;
+}
+
+
+/**
+ * Storing email addresses into our table
+ * @param  string $email the user submitted email address
+ * @return void
+ * ------------------------------------------------------------------------------
+ */
+function nanodesigns_store_emails( $email ) {
+	if( $email && is_email( $email ) ) :
+		global $wpdb;
+		$table_name = $wpdb->prefix . "email_downloads";
+
+		$wpdb->insert(
+				$table_name,
+				array(
+					'email' => $email,
+					'time'	=> date( 'Y-m-d H:i:s', current_time( 'timestamp' ) )
+				)
+			);
+	endif;
 }
 
 

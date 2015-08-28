@@ -52,7 +52,7 @@ add_action( 'admin_init', 'email_downloads_settings_init' );
 function email_downloads_sender_email_render() {
 	$options = get_option( 'email_downloads_settings' ); ?>
 
-	<input type="email" class="regular-text" name="email_downloads_settings[ed_sender_email]" value="<?php echo $options['ed_sender_email'] ? $options['ed_sender_email'] : get_option( 'admin_email' ); ?>"> <em class="howto"><span class="dashicons dashicons-info"></span> <?php _e( "<strong>default:</strong> administrator's email address", "email-downloads" ); ?></em>
+	<input type="email" class="regular-text" name="email_downloads_settings[ed_sender_email]" value="<?php echo $options['ed_sender_email'] ? $options['ed_sender_email'] : get_option( 'admin_email' ); ?>"> <em class="howto"><span class="dashicons dashicons-info"></span> <?php _e( "<strong>default:</strong> administrator's email address. The email function works better with something like <code>yourname@yourdomain.com</code>. Otherwise the email may not be sent properly.", "email-downloads" ); ?></em>
 
 	<?php
 }
