@@ -30,11 +30,11 @@
 // let not call the files directly
 if( !defined( 'ABSPATH' ) ) exit;
 
-// define necessary variables
+// define necessary variables';
 $plugin_version = '1.0.0';
 
-global $plugin_db_version;
-$plugin_db_version = '1.0';
+//time definition in hours
+$maximum_link_duration = 12; // in hours
 
 
 /**
@@ -43,31 +43,6 @@ $plugin_db_version = '1.0';
  * ------------------------------------------------------------------------------
  */
 function nanodesigns_email_downloads_activate() {
-
-	/**
-	 * Make a new table for storing email addresses
-	 * table: 'email_downloads'
-	 */
-    global $wpdb, $plugin_db_version;
-
-    $table_name = $wpdb->prefix . "email_downloads";
-    $charset_collate = $wpdb->get_charset_collate();
-
-    if( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) != $table_name ) {
-
-        $sql = "CREATE TABLE $table_name (
-                  id mediumint(9) NOT NULL AUTO_INCREMENT,
-                  email VARCHAR(100) DEFAULT '' NOT NULL,
-                  time datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-                  UNIQUE KEY id (id)
-                ) $charset_collate;";
-
-	    //reference to upgrade.php file
-	    require_once( ABSPATH .'wp-admin/includes/upgrade.php' );
-	    dbDelta( $sql );
-
-    }
-    add_option( 'email_downloads_db_version', $plugin_db_version );
 
 	/**
 	 * Add the necessary default settings to the 'options table'
@@ -92,7 +67,9 @@ register_activation_hook( __FILE__, 'nanodesigns_email_downloads_activate' );
  * @return string       formatted form.
  * ------------------------------------------------------------------------------
  */
-function nanodesigns_email_downloads_shortcode( $atts ) {    
+function nanodesigns_email_downloads_shortcode( $atts ) {
+	global $maximum_link_duration;
+
     $atts = shortcode_atts( array( 'file' => '' ), $atts );
     $file_path = $atts['file'];
 
@@ -111,7 +88,7 @@ function nanodesigns_email_downloads_shortcode( $atts ) {
                 $hash           = hash_hmac( 'md5', $unique_string, $ip_address ); //IP address is the key
 
                 //db storage - for 12 hours only
-                set_transient( $hash, $file_path, 12 * HOUR_IN_SECONDS );
+                set_transient( $hash, $file_path, $maximum_link_duration * HOUR_IN_SECONDS );
 
                 /**
                  * Making the download link with parameter
@@ -121,7 +98,7 @@ function nanodesigns_email_downloads_shortcode( $atts ) {
                 $download_link  = esc_url( add_query_arg( 'download_token', $hash, site_url() ) );
 
                 //email the download link
-                nanodesigns_email_downloads( $email, $download_link );
+                $success = nanodesigns_email_downloads( $email, $download_link );
 
                 //store the email into our database
                 nanodesigns_store_emails( $email );
@@ -134,18 +111,20 @@ function nanodesigns_email_downloads_shortcode( $atts ) {
 
     }
 
-    if( !empty( $submission_error ) ) {
-        foreach( $submission_error as $error ){
-            echo '<p style="color: red;">'. __( '<strong>Error: </strong>', 'email-downloads' ) . $error .'</p>';
-        }
-    }
-
     ob_start();
     ?>
     <hr>
     <div class="email-downloads">
-        <form action="" enctype="multipart/form-data" method="post">
+    	<form action="" enctype="multipart/form-data" method="post">
             <p><label for="download-email"><?php _e( 'Enter your email address to download the file. An email will be sent to your email address with the download link.', 'email-downloads' ); ?></label></p>
+            <?php
+	    	//Show errors, if any
+	    	if( !empty( $submission_error ) ) {
+		        foreach( $submission_error as $error ){
+		            echo '<p style="color: red;">'. __( '<strong>Error: </strong>', 'email-downloads' ) . $error .'</p>';
+		        }
+		    }
+		    ?>
             <p><input type="email" name="download_email" id="download-email" placeholder="type your email address here" value="<?php echo isset($_POST['download_email']) ? $_POST['download_email'] : ''; ?>" autocomple="off" size="50"></p>
             <button type="submit" name="download_submit"><?php _e( 'Send me the File', 'email-downloads' ); ?></button>
         </form>
@@ -203,9 +182,10 @@ add_action( 'template_redirect', 'nanodesigns_let_the_user_download' );
  */
 function nanodesigns_email_downloads( $email, $download_link ) {
     if( $email && is_email( $email ) && $download_link ) :
+    	global $maximum_link_duration;
         
         //get basic settings options from 'options' table
-        $ed_options = get_option( 'email_downloads_settings' );
+        $ed_options     = get_option( 'email_downloads_settings' );
         $_sender        = $ed_options['ed_sender_name'];
         $_from_email    = $ed_options['ed_sender_email'];
 
@@ -219,10 +199,18 @@ function nanodesigns_email_downloads( $email, $download_link ) {
                     <title><?php echo $subject; ?></title>
                     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
                 </head>
-                <body style="line-height: 1; font-family: Georgia, 'Times New Roman', serif; font-size: 15px;">
-                    <h2><?php _e('Wow! Download is Ready.', 'email-downloads' ); ?></h2>
+                <body style="line-height: 1; font-family: 'Trebuchet MS', Arial, Helvetica, sans-serif; font-size: 15px;">
+                    <h2 style="text-transform: uppercase; font-size: 22px"><?php _e('Your Download is ready!', 'email-downloads' ); ?></h2>
                     <p><?php _e('Please follow the following link to download the file:', 'email-downloads' ); ?></p>
-                    <p><a class="download-link" href="<?php echo esc_url( $download_link ); ?>" target="_blank" style="background-color: #E43435; color: #fff; padding: 4px 10px; border-radius: 4px; text-decoration: none;"><?php _e( 'Download File', 'email-downloads' ); ?></a></p>
+                    <p>
+                    	<a href="<?php echo esc_url( $download_link ); ?>" style="background-color: #E43435; color: #fff; padding: 10px; border-radius: 4px; text-decoration: none; font-size: 13px; font-weight: bold; display: inline-block;" target="_blank">
+                    		<?php _e( 'DOWNLOAD', 'email-downloads' ); ?>
+                    	</a>
+                		&nbsp;
+                		<small style="color: #666"><?php printf( __( '(the link is valid for %s hours only)', 'email_downloads' ), $maximum_link_duration ); ?></small>
+                    </p>
+                    <hr style="height: 1px; border: 0; border-top: 1px solid #999; margin: 10px 0">
+                    <p><small><a style="text-decoration: none; color: #1965A3;" href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php bloginfo( 'name' ); ?></a></small></p>
                 </body>
             </html>
 
@@ -243,9 +231,9 @@ function nanodesigns_email_downloads( $email, $download_link ) {
         $sent = wp_mail( $to_email, $subject, $message, $headers );
 
         if( $sent ) {
-            _e( '<p>The download link is sent to your email address. Check your inbox please</p>', 'email-downloads' );
+            _e( '<p style="color: green"><strong>Success!</strong> The download link is sent to your email address. Check your inbox please</p>', 'email-downloads' );
         } else {
-            printf( __( '<p>Sorry, an error occurred. Email cannot be sent.</p><p>You can try the following temporary link to download the file:<br><a href="%1$s" target="_blank" rel="nofollow">%1$s</a></p>', 'email-downloads' ), $download_link );
+            printf( __( '<p style="color: orange;">Sorry, an error occurred. Email cannot be sent.</p><p style="padding-left: 20px">You can try the following temporary link to download the file:<br><a href="%1$s" target="_blank" rel="nofollow">%1$s</a></p>', 'email-downloads' ), $download_link );
         }
 
     endif;
@@ -260,16 +248,17 @@ function nanodesigns_email_downloads( $email, $download_link ) {
  */
 function nanodesigns_store_emails( $email ) {
 	if( $email && is_email( $email ) ) :
-		global $wpdb;
-		$table_name = $wpdb->prefix . "email_downloads";
+		
+		if( nano_email_exists( $email ) ) {
+			//don't duplicate email addresses
+			return;
+		} else {
+            $currenttimestring = strtotime( date( 'Y-m-d H:i:s', current_time( 'timestamp' ) ) );
+            $ip_address = nanodesigns_get_the_ip();
+            $hashed_string = md5( $currenttimestring . $ip_address );
 
-		$wpdb->insert(
-				$table_name,
-				array(
-					'email' => $email,
-					'time'	=> date( 'Y-m-d H:i:s', current_time( 'timestamp' ) )
-				)
-			);
+            update_option( "edmail_{$hashed_string}", $email );
+		}
 	endif;
 }
 
@@ -296,6 +285,52 @@ function nanodesigns_get_the_ip() {
 
 
 /**
+ * Checking whether the email already exists or not.
+ * @param  integer $email email address to check.
+ * @return boolean        exists or not.
+ * ------------------------------------------------------------------------------
+ */
+function nano_email_exists( $email ) {
+    $emails = nano_email_lists(); //all the emails
+
+	if( in_array( $email, $emails ) )
+		return true;
+	else
+		return false;
+}
+
+
+/**
  * Plugin Options Page (Settings)
  */
 require_once 'ed-options.php';
+
+
+
+function nano_email_lists( $posts_per_page = null, $offset = null ) {
+    global $wpdb;
+    $option_table = $wpdb->prefix .'options';
+    
+    $_email_data = wp_cache_get( 'nano_ed_email_storage' );
+    if ( false === $_email_data ) {
+        $query = "SELECT option_value FROM {$option_table} WHERE option_name LIKE 'edmail_%' GROUP BY option_id";
+
+        if( $posts_per_page ) {
+            $query .= " LIMIT {$posts_per_page}";
+        }
+
+        if( $offset ) {
+            $query .= " OFFSET {$offset}";
+        }
+
+        $_email_data = $wpdb->get_results( $query );
+        wp_cache_set( 'nano_ed_email_storage', $_email_data );
+    }
+
+    $emails = array();
+    foreach( $_email_data as $_email ) {
+        $emails[] = $_email->option_value;
+    }
+
+    return $emails;
+}
