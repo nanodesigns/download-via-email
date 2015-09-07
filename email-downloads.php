@@ -309,11 +309,10 @@ require_once 'ed-options.php';
 
 function nano_email_lists( $posts_per_page = null, $offset = null ) {
     global $wpdb;
-    $option_table = $wpdb->prefix .'options';
     
     $_email_data = wp_cache_get( 'nano_ed_email_storage' );
     if ( false === $_email_data ) {
-        $query = "SELECT option_value FROM {$option_table} WHERE option_name LIKE 'edmail_%' GROUP BY option_id";
+        $query = "SELECT option_value FROM {$wpdb->options} WHERE option_name LIKE 'edmail_%' GROUP BY option_id";
 
         if( $posts_per_page ) {
             $query .= " LIMIT {$posts_per_page}";

@@ -125,9 +125,7 @@ function email_downloads_options_page_callback() { ?>
 			</table>
 			<?php
 			global $wpdb;
-			$option_table = $wpdb->prefix .'options';
-
-			$total = $wpdb->get_var( "SELECT COUNT('option_name') FROM {$option_table} WHERE option_name LIKE 'edmail_%' GROUP BY option_id" );
+			$total = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE 'edmail_%'" );
 			$num_of_pages = ceil( $total / $posts_per_page );
 
 			$page_links = paginate_links( array(
@@ -143,37 +141,6 @@ function email_downloads_options_page_callback() { ?>
 			    echo '<div class="tablenav"><div class="tablenav-pages" style="margin: 1em 0">'. $page_links .'</div></div>';
 			}
 			?>
-			<br>
-			<?php
-			/*
-			// Make CSV from the db storage
-			function download_csv_results( $results, $name = NULL ) {
-			    if( ! $name)
-			    	$name = md5(uniqid() . microtime(TRUE) . mt_rand()). '.csv';
-
-			    header('Content-Type: text/csv');
-			    header('Content-Disposition: attachment; filename='. $name);
-			    header('Pragma: no-cache');
-			    header("Expires: 0");
-
-			    $outstream = fopen("php://output", "w");
-
-			    foreach( $results as $result ) {
-			        fputcsv( $outstream, $result );
-			    }
-
-			    fclose($outstream);
-			}
-
-			if( isset($_POST['csv_submit']) ) {
-				$email = $emails->email;
-				download_csv_results( $email, 'something.csv' );
-			}
-			?>
-			<form action="" method="post">
-				<button class="button" type="submit" name="csv_submit">Download as CSV</button>
-			</form>
-			<?php */ ?>
 	<?php endif; ?>
 
 	</div> <!-- .wrap -->
