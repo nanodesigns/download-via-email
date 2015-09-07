@@ -21,21 +21,21 @@ Embed a form in your pages and posts that accept an email address in exchange fo
 4. Change the necessary settings from the admin panel 'Email Downloads' menu page
 
 Now, put the shortcode into page/post
-<code>[email-downloads file="path/to/the/file.ext"]</code>
+<code>[email-downloads file="absolute-path/to/the/file.ext"]</code>
 
 == Frequently Asked Questions ==
 
 = What is the shortcode =
 
-<code>[email-downloads file="path/to/the/file.ext"]</code> is  the shortcode. You have to mention the absolute path of the file to let the user download the file. It is not necessary to upload the file to your WordPress site, it can be any public path, even can be a dropbox, onedrive, or google drive link
+<code>[email-downloads file="absolute-path/to/the/file.ext"]</code> is  the shortcode. You have to mention the absolute path of the file to let the user download the file. It is not necessary to upload the file to your WordPress site, it can be any public path, even can be a Dropbox, OneDrive, or Google Drive link
 
 = Will my download link be encrypted =
 
 Yes, we do not believe in sending raw absolute URL of a file, so it's by core encrypted to its maximum strength
 
-= Is the mail HTML formatted =
+= Is the mail HTML-formatted =
 
-Yes, the email is HTML formatted by default
+Yes, the email is HTML-formatted by default
 
 = For how long the link will be valid? =
 
@@ -50,8 +50,12 @@ By default any link that is generated for an email address would be valid for 12
 
 = 1.0.0 =
 * A rudimentary WordPress plugin to enable sending download link to email address
+* Completely in WordPress database schema - no other table, no column
+* Email storage
 
 == Upgrade Notice ==
 
 = 1.0.0 =
 A rudimentary WordPress plugin to enable sending download link to email address
+Completely in WordPress database schema - no other table, no column
+Email storage
