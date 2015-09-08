@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Email Downloads
+ * Plugin Name: Download via Email
  * Plugin URI: http://nanodesignsbd.com/
  * Description: Embed a form in your pages and posts that accept an email address in exchange for a file to download. The plugin is simpler, quicker, with minimal database usage, and completely in WordPress' way.
  * Version: 1.0.0
@@ -39,7 +39,8 @@ $maximum_link_duration = 12; // in hours
 
 /**
  * Set basic settings on the activation of the plugin.
- * @return void
+ *
+ * Saved in 'options' table.
  * ------------------------------------------------------------------------------
  */
 function nanodesigns_email_downloads_activate() {
@@ -61,9 +62,10 @@ register_activation_hook( __FILE__, 'nanodesigns_email_downloads_activate' );
 
 
 /**
- * Shortcode
- * Usage: [email-downloads file="http://path/to/file.ext"]
- * @param  array $atts attributes that passed through shortcode.
+ * Shortcode.
+ * Usage: [email-downloads file="http://path/to/file.ext"].
+ * 
+ * @param  array $atts  attributes that passed through shortcode.
  * @return string       formatted form.
  * ------------------------------------------------------------------------------
  */
@@ -136,8 +138,9 @@ add_shortcode( 'email-downloads', 'nanodesigns_email_downloads_shortcode' );
 
 
 /**
- * The Actual download link processor
- * @return void
+ * The Actual download link processor.
+ *
+ * The function to process the link and let the user download the file or not.
  * ------------------------------------------------------------------------------
  */
 function nanodesigns_let_the_user_download() {
@@ -174,10 +177,9 @@ add_action( 'template_redirect', 'nanodesigns_let_the_user_download' );
 
 
 /**
- * Download link mailer
- * @param  string $email         the user submitted email address
- * @param  string $download_link the author submitted file path (hashed)
- * @return void
+ * Download link mailer.
+ * @param  string $email         the user submitted email address.
+ * @param  string $download_link the author submitted file path (hashed).
  * ------------------------------------------------------------------------------
  */
 function nanodesigns_email_downloads( $email, $download_link ) {
@@ -241,9 +243,9 @@ function nanodesigns_email_downloads( $email, $download_link ) {
 
 
 /**
- * Storing email addresses into our table
+ * Storing email addresses into our table.
+ * 
  * @param  string $email the user submitted email address
- * @return void
  * ------------------------------------------------------------------------------
  */
 function nanodesigns_store_emails( $email ) {
@@ -257,7 +259,7 @@ function nanodesigns_store_emails( $email ) {
             $ip_address = nanodesigns_get_the_ip();
             $hashed_string = md5( $currenttimestring . $ip_address );
 
-            update_option( "edmail_{$hashed_string}", $email );
+            update_option( "nanoedmail_{$hashed_string}", $email );
 		}
 	endif;
 }
@@ -265,9 +267,11 @@ function nanodesigns_store_emails( $email ) {
 
 
 /**
- * Get the user's IP address
+ * Get the user's IP address.
+ * 
  * @author Barış Ünver
  * @link http://code.tutsplus.com/articles/creating-a-simple-contact-form-for-simple-needs--wp-27893
+ * 
  * @return string IP address, formatted.
  * ------------------------------------------------------------------------------
  */
@@ -286,6 +290,7 @@ function nanodesigns_get_the_ip() {
 
 /**
  * Checking whether the email already exists or not.
+ * 
  * @param  integer $email email address to check.
  * @return boolean        exists or not.
  * ------------------------------------------------------------------------------
@@ -301,18 +306,19 @@ function nano_email_exists( $email ) {
 
 
 /**
- * Plugin Options Page (Settings)
+ * Email lists query.
+ * 
+ * @param  integer $posts_per_page limiting the query.
+ * @param  integer $offset         escaping no. of items.
+ * @return array                   emails that are stored.
+ * ------------------------------------------------------------------------------
  */
-require_once 'ed-options.php';
-
-
-
 function nano_email_lists( $posts_per_page = null, $offset = null ) {
     global $wpdb;
     
     $_email_data = wp_cache_get( 'nano_ed_email_storage' );
     if ( false === $_email_data ) {
-        $query = "SELECT option_value FROM {$wpdb->options} WHERE option_name LIKE 'edmail_%' GROUP BY option_id";
+        $query = "SELECT option_value FROM {$wpdb->options} WHERE option_name LIKE 'nanoedmail_%' GROUP BY option_id";
 
         if( $posts_per_page ) {
             $query .= " LIMIT {$posts_per_page}";
@@ -333,3 +339,10 @@ function nano_email_lists( $posts_per_page = null, $offset = null ) {
 
     return $emails;
 }
+
+
+/**
+ * Plugin Options Page (Settings)
+ * using Settings API.
+ */
+require_once 'ed-options.php';

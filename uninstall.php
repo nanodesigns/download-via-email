@@ -4,7 +4,7 @@
  *
  * Page to delete data associated with the plugin on its uninstallation.
  *
- * @package  email-downloads
+ * @package  download-via-email
  */
 
 //if uninstall not called from WordPress exit
@@ -18,3 +18,17 @@ delete_option( $option_name );
 // For site options in multisite
 if ( is_multisite() && get_site_option( $option_name ) )
 	delete_site_option( $option_name );
+
+
+/**
+ * Delete all the saved email addresses
+ */
+global $wpdb;
+$delete_saved_emails = $wpdb->query( 
+							$wpdb->prepare( 
+								"DELETE FROM $wpdb->options
+								 WHERE option_name LIKE %s
+								",
+							        'nanoedmail_%' 
+						        )
+						);

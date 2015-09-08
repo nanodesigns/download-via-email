@@ -4,14 +4,28 @@
  *
  * Page to set all the basic settings for the plugin.
  *
- * @package  email-downloads
+ * @package  download-via-email
  */
+
+function email_downloads_enqueue_styles() {
+	$screen = get_current_screen();
+	if( $screen->id === 'toplevel_page_email_downloads' ) {
+		wp_enqueue_style( 'nano_downloads_email', plugins_url('css/admin-stylesheet.css', __FILE__) );
+	}
+}
+add_action( 'admin_enqueue_scripts', 'email_downloads_enqueue_styles' );
 
 function email_downloads_add_admin_menu() {
 	add_menu_page(
-		__( 'Email Downloads', 'email-downloads' ),
-		__( 'Email Downloads', 'email-downloads' ),
-		'manage_options',
+		__( 'Downloads via Email', 'email-downloads' ),
+		__( 'Downloads via Email', 'email-downloads' ),
+
+		/**
+		 * Filter the admin menu access.
+		 *
+		 * Default access privilege: administrator
+		 */
+		apply_filters( 'nano_ed_role', 'manage_options' ),
 		'email_downloads',
 		'email_downloads_options_page_callback',
 		'dashicons-email-alt'
@@ -52,7 +66,7 @@ add_action( 'admin_init', 'email_downloads_settings_init' );
 function email_downloads_sender_email_render() {
 	$options = get_option( 'email_downloads_settings' ); ?>
 
-	<input type="email" class="regular-text" name="email_downloads_settings[ed_sender_email]" value="<?php echo $options['ed_sender_email'] ? $options['ed_sender_email'] : get_option( 'admin_email' ); ?>"> <em class="howto"><span class="dashicons dashicons-info"></span> <?php _e( "<strong>default:</strong> administrator's email address. Make sure to put an on-domain email address like <code>something@yourdomain.com</code>, otherwise the email may not be sent.", "email-downloads" ); ?></em>
+	<input type="email" class="regular-text" name="email_downloads_settings[ed_sender_email]" value="<?php echo $options['ed_sender_email'] ? $options['ed_sender_email'] : get_option( 'admin_email' ); ?>"> <em class="howto"><span class="dashicons dashicons-info"></span> <?php _e( "Make sure to put an on-domain email address like <code>something@yourdomain.com</code>, otherwise the email may not be sent. <strong>default:</strong> administrator's email address", "email-downloads" ); ?></em>
 
 	<?php
 }
@@ -74,21 +88,35 @@ function email_downloads_settings_section_callback() {
 
 function email_downloads_options_page_callback() { ?>
 	<div class="wrap">
-		<form action='options.php' method='post'>		
-			<h2><span class="dashicons dashicons-email-alt"></span> <?php _e( 'Email Downloads', 'email-downloads' ); ?></h2>		
-			<?php
-			settings_fields( 'ed' );
-			do_settings_sections( 'ed' );
-			submit_button();
-			?>
-		</form>
+		
+				<form action='options.php' method='post'>
+
+					<h2><?php printf( __( 'Downloads via Email <small>by <a class="link-none" href="%s"><strong>nano</strong>designs</a></small>', 'email-downloads' ), 'http://nanodesignsbd.com/' ); ?></h2>
+
+					<div class="ed-row">
+						<div class="ed-column-left">
+							<?php
+							settings_fields( 'ed' );
+							do_settings_sections( 'ed' );
+							submit_button();
+							?>
+						</div>
+						<div class="ed-column-right">
+							<?php require_once '__nanodesigns_promo.php'; ?>
+						</div>
+						<div class="ed-clearfix"></div>
+					</div>
+
+				</form>
+			
 
 
 	<?php
 	/**
-	 * Pagination in action
-	 * @link http://tareq.wedevs.com/2011/07/simple-pagination-system-in-your-wordpress-plugins/
+	 * Pagination in action.
 	 * @author  Tareq Hasan
+	 * @link http://tareq.wedevs.com/2011/07/simple-pagination-system-in-your-wordpress-plugins/
+	 * ------------------------------------------------------------------------------
 	 */
 	$pagenum = isset( $_GET['pagenum'] ) ? absint( $_GET['pagenum'] ) : 1;
 
@@ -125,7 +153,7 @@ function email_downloads_options_page_callback() { ?>
 			</table>
 			<?php
 			global $wpdb;
-			$total = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE 'edmail_%'" );
+			$total = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE 'nanoedmail_%'" );
 			$num_of_pages = ceil( $total / $posts_per_page );
 
 			$page_links = paginate_links( array(
