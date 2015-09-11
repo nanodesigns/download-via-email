@@ -65,8 +65,8 @@ register_activation_hook( __FILE__, 'nanodesigns_email_downloads_activate' );
  * Shortcode.
  * Usage: [email-downloads file="http://path/to/file.ext"].
  * 
- * @param  array $atts  attributes that passed through shortcode.
- * @return string       formatted form.
+ * @param  array $atts  Attributes that passed through shortcode.
+ * @return string       Formatted form.
  * ------------------------------------------------------------------------------
  */
 function nanodesigns_email_downloads_shortcode( $atts ) {
@@ -127,7 +127,7 @@ function nanodesigns_email_downloads_shortcode( $atts ) {
 		        }
 		    }
 		    ?>
-            <p><input type="email" name="download_email" id="download-email" placeholder="type your email address here" value="<?php echo isset($_POST['download_email']) ? $_POST['download_email'] : ''; ?>" autocomple="off" size="50"></p>
+            <p><input type="email" name="download_email" id="download-email" placeholder="type your email address here" value="<?php echo isset($_POST['download_email']) ? $_POST['download_email'] : ''; ?>" autocomplete="off" size="50"></p>
             <button type="submit" name="download_submit"><?php _e( 'Send me the File', 'email-downloads' ); ?></button>
         </form>
     </div>
@@ -153,9 +153,11 @@ function nanodesigns_let_the_user_download() {
         if( $transient_data ) {
 
             //forcing download with appropriate headers
+            header('Expires: 0');
+            header('Pragma: public');
+            header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
             header('Content-Type: '. get_mime_type( $file ));
             header('Content-Description: File Transfer');
-            header('Content-Transfer-Encoding: Binary');
             header('Content-disposition: attachment; filename="'. $file .'"');
             header('Content-Length: '. @filesize( $file ));
             header('Cache-Control: must-revalidate');
@@ -180,8 +182,8 @@ add_action( 'template_redirect', 'nanodesigns_let_the_user_download' );
 /**
  * Download link mailer.
  * 
- * @param  string $email         the user submitted email address.
- * @param  string $download_link the author submitted file path (hashed).
+ * @param  string $email         The user submitted email address.
+ * @param  string $download_link The author submitted file path (hashed).
  * ------------------------------------------------------------------------------
  */
 function nanodesigns_email_downloads( $email, $download_link ) {
@@ -247,7 +249,7 @@ function nanodesigns_email_downloads( $email, $download_link ) {
 /**
  * Storing email addresses into our table.
  * 
- * @param  string $email the user submitted email address
+ * @param  string $email The user submitted email address.
  * ------------------------------------------------------------------------------
  */
 function nanodesigns_store_emails( $email ) {
@@ -293,8 +295,8 @@ function nanodesigns_get_the_ip() {
 /**
  * Checking whether the email already exists or not.
  * 
- * @param  integer $email email address to check.
- * @return boolean        exists or not.
+ * @param  integer $email Email address to check.
+ * @return boolean        Exists or not.
  * ------------------------------------------------------------------------------
  */
 function nano_email_exists( $email ) {
@@ -310,9 +312,9 @@ function nano_email_exists( $email ) {
 /**
  * Email lists query.
  * 
- * @param  integer $posts_per_page limiting the query.
- * @param  integer $offset         escaping no. of items.
- * @return array                   emails that are stored.
+ * @param  integer $posts_per_page Limiting the query.
+ * @param  integer $offset         Escaping no. of items.
+ * @return array                   Emails that are stored.
  * ------------------------------------------------------------------------------
  */
 function nano_email_lists( $posts_per_page = null, $offset = null ) {
@@ -549,7 +551,7 @@ function get_mime_type( $filename ) {
 
 
 /**
- * Plugin Options Page (Settings)
+ * Plugin Options Page (Settings).
  * using Settings API.
  * ------------------------------------------------------------------------------
  */

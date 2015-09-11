@@ -7,7 +7,7 @@
  * @package  download-via-email
  */
 
-//if uninstall not called from WordPress exit
+// If uninstall not called from WordPress, exit
 if( !defined( 'ABSPATH' ) && !defined( 'WP_UNINSTALL_PLUGIN' ) )
     exit();
 
@@ -22,6 +22,7 @@ if ( is_multisite() && get_site_option( $option_name ) )
 
 /**
  * Delete all the saved email addresses
+ * ------------------------------------------------------------------------------
  */
 global $wpdb;
 $delete_saved_emails = $wpdb->query( 

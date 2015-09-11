@@ -29,6 +29,10 @@ Now, put the shortcode into page/post
 
 <code>[email-downloads file="absolute-path/to/the/file.ext"]</code> is  the shortcode. You have to mention the absolute path of the file to let the user download the file. It is not necessary to upload the file to your WordPress site, it can be any public path, even can be a Dropbox, OneDrive, or Google Drive link
 
+= What type of email is supported as sender? =
+
+For now on, only an on-domain email address as sender works, because we used rudimentary WordPress mailer function that works with an on-domain email address like `something@yourdomain.com`
+
 = Will my download link be encrypted =
 
 Yes, we do not believe in sending raw absolute URL of a file, so it's by core encrypted to its maximum strength
@@ -40,6 +44,14 @@ Yes, the email is HTML-formatted by default
 = For how long the link will be valid? =
 
 By default any link that is generated for an email address would be valid for 12 hours only
+
+= What happen to the email addresses got by the form? =
+
+The email addresses are saved in database, and is visible in the admin menu page
+
+= Does the plugin deletes its data on deletion? =
+
+Yes, the plugin deletes all its data on uninstallation
 
 == Screenshots ==
 

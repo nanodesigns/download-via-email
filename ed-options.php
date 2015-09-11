@@ -7,6 +7,9 @@
  * @package  download-via-email
  */
 
+/**
+ * Enqueue Stylesheet for admin Screen.
+ */
 function email_downloads_enqueue_styles() {
 	$screen = get_current_screen();
 	if( $screen->id === 'toplevel_page_email_downloads' ) {
@@ -15,6 +18,9 @@ function email_downloads_enqueue_styles() {
 }
 add_action( 'admin_enqueue_scripts', 'email_downloads_enqueue_styles' );
 
+/**
+ * Admin Menu Page.
+ */
 function email_downloads_add_admin_menu() {
 	add_menu_page(
 		__( 'Downloads via Email', 'email-downloads' ),
@@ -89,25 +95,25 @@ function email_downloads_settings_section_callback() {
 function email_downloads_options_page_callback() { ?>
 	<div class="wrap">
 		
-				<form action='options.php' method='post'>
+		<form action='options.php' method='post'>
 
-					<h2><?php printf( __( 'Downloads via Email <small>by <a class="link-none" href="%s"><strong>nano</strong>designs</a></small>', 'email-downloads' ), 'http://nanodesignsbd.com/' ); ?></h2>
+			<h2><?php printf( __( 'Downloads via Email <small>by <a class="link-none" href="%s"><strong>nano</strong>designs</a></small>', 'email-downloads' ), 'http://nanodesignsbd.com/' ); ?></h2>
 
-					<div class="ed-row">
-						<div class="ed-column-left">
-							<?php
-							settings_fields( 'ed' );
-							do_settings_sections( 'ed' );
-							submit_button();
-							?>
-						</div>
-						<div class="ed-column-right">
-							<?php require_once '__nanodesigns_promo.php'; ?>
-						</div>
-						<div class="ed-clearfix"></div>
-					</div>
+			<div class="ed-row">
+				<div class="ed-column-left">
+					<?php
+					settings_fields( 'ed' );
+					do_settings_sections( 'ed' );
+					submit_button();
+					?>
+				</div>
+				<div class="ed-column-right">
+					<?php require_once '__nanodesigns_promo.php'; ?>
+				</div>
+				<div class="ed-clearfix"></div>
+			</div>
 
-				</form>
+		</form>
 			
 
 
