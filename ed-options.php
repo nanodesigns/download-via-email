@@ -9,6 +9,7 @@
 
 /**
  * Enqueue Stylesheet for admin Screen.
+ * ------------------------------------------------------------------------------
  */
 function email_downloads_enqueue_styles() {
 	$screen = get_current_screen();
@@ -20,6 +21,7 @@ add_action( 'admin_enqueue_scripts', 'email_downloads_enqueue_styles' );
 
 /**
  * Admin Menu Page.
+ * ------------------------------------------------------------------------------
  */
 function email_downloads_add_admin_menu() {
 	add_menu_page(
@@ -72,13 +74,14 @@ add_action( 'admin_init', 'email_downloads_settings_init' );
 function email_downloads_sender_email_render() {
 	$options = get_option( 'email_downloads_settings' ); ?>
 
-	<input type="email" class="regular-text" name="email_downloads_settings[ed_sender_email]" value="<?php echo $options['ed_sender_email'] ? $options['ed_sender_email'] : get_option( 'admin_email' ); ?>"> <em class="howto"><span class="dashicons dashicons-info"></span> <?php _e( "Make sure to put an on-domain email address like <code>something@yourdomain.com</code>, otherwise the email may not be sent. <strong>default:</strong> administrator's email address", "email-downloads" ); ?></em>
+	<input type="email" class="regular-text" name="email_downloads_settings[ed_sender_email]" value="<?php echo $options['ed_sender_email'] ? $options['ed_sender_email'] : noreply_email(); ?>"> <em class="howto"><span class="dashicons dashicons-info"></span> <?php printf( __( "Make sure to put an on-domain email address like <code>%1\$s</code>, otherwise the email may not be sent. <strong>default:</strong> %1\$s", "email-downloads" ), noreply_email() ); ?></em>
 
 	<?php
 }
 
 function email_downloads_sender_name_render() {
 	$options = get_option( 'email_downloads_settings' );
+	$noreply_email = noreply_email();
 	$admin_email = get_option( 'admin_email' );
 	$admin_user = get_user_by( 'email', $admin_email );
 	?>
@@ -122,7 +125,7 @@ function email_downloads_options_page_callback() { ?>
 	 * Pagination in action.
 	 * @author  Tareq Hasan
 	 * @link http://tareq.wedevs.com/2011/07/simple-pagination-system-in-your-wordpress-plugins/
-	 * ------------------------------------------------------------------------------
+	 * --------------
 	 */
 	$pagenum = isset( $_GET['pagenum'] ) ? absint( $_GET['pagenum'] ) : 1;
 

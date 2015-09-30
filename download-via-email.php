@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Download via Email
  * Plugin URI: http://nanodesignsbd.com/
- * Description: Embed a form in your pages and posts that accept an email address in exchange for a file to download. The plugin is simpler, quicker, with minimal database usage, and completely in WordPress' way.
+ * Description: Embed a form using shortcode (<code>[email-downloads file="absolute-path/to/the/file.ext"]</code>) in your pages and posts that accept an email address in exchange for a file to download. The plugin is simpler, quicker, with minimal database usage, and completely in WordPress' way.
  * Version: 1.0.0
  * Author: Mayeenul Islam (@mayeenulislam)
  * Author URI: http://nanodesignsbd.com/mayeenulislam/
@@ -48,11 +48,12 @@ function nanodesigns_email_downloads_activate() {
 	/**
 	 * Add the necessary default settings to the 'options table'
 	 */
+    $noreply_email = noreply_email();
     $admin_email = get_option( 'admin_email' );
     $admin_user = get_user_by( 'email', $admin_email );
 
     $ed_settings = array(
-            'ed_sender_email'   => $admin_email,
+            'ed_sender_email'   => noreply_email(),
             'ed_sender_name'    => $admin_user->display_name
         );    
     update_option( 'email_downloads_settings', $ed_settings );
@@ -153,12 +154,12 @@ function nanodesigns_let_the_user_download() {
         if( $transient_data ) {
 
             //forcing download with appropriate headers
-            header('Expires: 0');
+            //header('Expires: 0');
             header('Pragma: public');
             header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
             header('Content-Type: '. get_mime_type( $file ));
             header('Content-Description: File Transfer');
-            header('Content-disposition: attachment; filename="'. $file .'"');
+            header('Content-Disposition: attachment; filename="'. $file .'"');
             header('Content-Length: '. @filesize( $file ));
             header('Cache-Control: must-revalidate');
 
@@ -548,6 +549,34 @@ function get_mime_type( $filename ) {
             return $mime_type;
     }
 }
+
+
+/**
+ * Making noReply Email from Host URL.
+ * @return string noreply@yourdomain.dom
+ * ------------------------------------------------------------------------------
+ */
+function noreply_email(){
+    $info = parse_url( home_url() );
+    $host = $info['host'];
+    $domain = preg_replace( '/^www./', '', $host );
+    return 'noreply@'. $domain;
+}
+
+
+/**
+ * Add a Settings link to Plugins page.
+ * @param  array $links Default Links.
+ * @return array        Merged with our defined links to settings page.
+ * ------------------------------------------------------------------------------
+ */
+function nano_ed_add_plugin_action_links ( $links ) {
+    $settings_page_link = array(
+        '<a href="'. admin_url( 'admin.php?page=email_downloads' ) .'">'. __( 'Settings', 'email-downloads' ) .'</a>',
+    );
+    return array_merge( $links, $settings_page_link );
+}
+add_filter( 'plugin_action_links_'. plugin_basename(__FILE__), 'nano_ed_add_plugin_action_links' );
 
 
 /**
