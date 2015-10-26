@@ -1,17 +1,24 @@
-# Email Downloads
+<img src="assets/banner-1544x500.png" alt="Download via Email - WordPress Plugin"/>
+# Download via Email
 Embed a form in your pages and posts that accept an email address in exchange for a file to download. The plugin is simpler, quicker, with minimal database usage, and completely in WordPress' way.
 
-Version 1.0.0<br>
+----
+
+[**DOWNLOAD**](https://github.com/nanodesigns/download-via-email/releases/tag/1.0.0) *stable version 1.0.0*
+
+----
+
+Version 1.0.1<br>
 **Developers:** Mayeenul Islam ([@mayeenulislam](http://twitter.com/mayeenulislam)), Sisir Kanti Adhikari ([@prionkor](http://twitter.com/prionkor))<br>
-**Tested up to:** 4.3<br>
+**Tested up to:** 4.3.1<br>
 **License:** [GPLv2](http://www.gnu.org/licenses/gpl-2.0.html) or later
 
 ## Installation
 
 1. Download the latest version of the plugin from Github release
-2. Unzip the plugin, and Upload `email-downloads` folder to the `/wp-content/plugins/` directory
+2. Unzip the plugin, and Upload `download-via-email` folder to the `wp-content/plugins/` directory
 3. Activate the plugin through the 'Plugins' menu in WordPress admin panel
-4. Change the necessary settings from the admin panel 'Email Downloads' menu page
+4. Change the necessary settings from the admin panel 'Download via Email' menu page
 
 Now, put the shortcode into page/post<br>
 `[email-downloads file="absolute-path/to/the/file.ext"]`
@@ -24,7 +31,7 @@ Now, put the shortcode into page/post<br>
 
 ### What type of email is supported as sender?
 
-For now on, only an on-domain email address as sender works, because we used rudimentary WordPress mailer function that works with an on-domain email address like `something@yourdomain.com`
+For now on, only an on-domain email address as sender works, because we used rudimentary WordPress mailer function that works with an on-domain email address like `something@yourdomain.com`. Default is `noreply@yourdomain.com`.
 
 ### Will my download link be encrypted?
 
@@ -48,18 +55,21 @@ Yes, the plugin deletes all its data on uninstallation
 
 ## Screenshots
 
-![Email Downloads - how it will look like at the front end](assets/screenshot-1.png "Email Downloads - how it will look like at the front end")<br>
-_Email Downloads - how it will look like at the front end_
+![Download via Email - how it will look like at the front end](assets/screenshot-1.png "Download via Email - how it will look like at the front end")<br>
+_Download via Email - how it will look like at the front end_
 
-![Email Downloads - the admin panel settings page](assets/screenshot-2.png "Email Downloads - the admin panel settings page")<br>
-_Email Downloads - the admin panel settings page_
+![Download via Email - the admin panel settings page](assets/screenshot-2.png "Download via Email - the admin panel settings page")<br>
+_Download via Email - the admin panel settings page_
 
 ## Changelog
+
+### 1.0.1
+* New database `download_via_email` is added to sort stored email correctly
 
 ### 1.0.0
 * A rudimentary WordPress plugin to enable sending download link to email address
 * Completely in WordPress database schema - no other table, no column
-* Email storage
+* Email storage in `options` table
 
 __________________
 Designed &amp; Developed by [**nano**designs](http://nanodesignsbd.com/)
