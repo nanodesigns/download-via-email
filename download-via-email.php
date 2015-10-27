@@ -38,22 +38,59 @@ $maximum_link_duration = 12; // in hours
 
 
 /**
- * Set basic settings on the activation of the plugin.
+ * The Database version.
+ * By which we can update the table with new versions.
  *
- * Saved in 'options' table.
+ * @since 1.0.1
+ * ------------------------------------------------------------------------------
+ */
+global $nano_db_version;
+$nano_db_version = "1.0";
+
+
+/**
+ * Set basic settings on the activation of the plugin.
+ * - Saved in 'options' table.
+ * - Creating custom table for storing email addresses.
  * ------------------------------------------------------------------------------
  */
 function nanodesigns_email_downloads_activate() {
 
+    /**
+     * Creating a custom table.
+     * @since 1.0.1
+     * -----------
+     */
+    global $wpdb, $nano_db_version;
+
+    $table = $wpdb->prefix .'download_email';
+
+    if( $wpdb->get_var( "SHOW TABLES LIKE '$table'" ) != $table ) {
+        $sql = "CREATE TABLE $table (
+                  id mediumint(9) NOT NULL AUTO_INCREMENT,
+                  email tinytext NOT NULL,
+                  UNIQUE KEY id (id)
+                );";
+
+        //reference to upgrade.php file
+        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+        dbDelta( $sql );
+    } //endif($wpdb->get_var
+
+    update_option( "nano_ed_db_version", $nano_db_version );
+
+
 	/**
-	 * Add the necessary default settings to the 'options table'
-	 */
+     * Add the necessary default settings to the 'options table'.
+     * @since 1.0.0
+     * -----------
+     */
     $noreply_email = noreply_email();
     $admin_email = get_option( 'admin_email' );
     $admin_user = get_user_by( 'email', $admin_email );
 
     $ed_settings = array(
-            'ed_sender_email'   => noreply_email(),
+            'ed_sender_email'   => $noreply_email,
             'ed_sender_name'    => $admin_user->display_name
         );    
     update_option( 'email_downloads_settings', $ed_settings );
@@ -104,7 +141,7 @@ function nanodesigns_email_downloads_shortcode( $atts ) {
                 $success = nanodesigns_email_downloads( $email, $download_link );
 
                 //store the email into our database
-                nanodesigns_store_emails( $email );
+                nanodesigns_ed_store_emails( $email );
             } else {
                 $submission_error[] = __( 'Please enter a valid email address', 'email-downloads' );
             }
@@ -144,7 +181,7 @@ add_shortcode( 'email-downloads', 'nanodesigns_email_downloads_shortcode' );
  * The function to process the link and let the user download the file or not.
  * ------------------------------------------------------------------------------
  */
-function nanodesigns_let_the_user_download() {
+function nanodesigns_ed_let_the_user_download() {
     if( isset($_GET['download_token']) ){
         $download_token = sanitize_text_field( $_GET['download_token'] );
         $transient_data = get_transient( $download_token );
@@ -177,7 +214,7 @@ function nanodesigns_let_the_user_download() {
         }
     }
 }
-add_action( 'template_redirect', 'nanodesigns_let_the_user_download' );
+add_action( 'template_redirect', 'nanodesigns_ed_let_the_user_download' );
 
 
 /**
@@ -253,19 +290,18 @@ function nanodesigns_email_downloads( $email, $download_link ) {
  * @param  string $email The user submitted email address.
  * ------------------------------------------------------------------------------
  */
-function nanodesigns_store_emails( $email ) {
+function nanodesigns_ed_store_emails( $email ) {
 	if( $email && is_email( $email ) ) :
 		
-		if( nano_email_exists( $email ) ) {
+		if( nano_ed_email_exists( $email ) ) {
 			//don't duplicate email addresses
 			return;
 		} else {
-            $currenttimestring = strtotime( date( 'Y-m-d H:i:s', current_time( 'timestamp' ) ) );
-            $ip_address = nanodesigns_get_the_ip();
-            $hashed_string = md5( $currenttimestring . $ip_address );
-
-            update_option( "nanoedmail_{$hashed_string}", $email );
+            global $wpdb;
+            $table = $wpdb->prefix .'download_email';
+            $wpdb->insert( $table, array( 'email' => $email ), array( '%s' ) );
 		}
+
 	endif;
 }
 
@@ -300,8 +336,8 @@ function nanodesigns_get_the_ip() {
  * @return boolean        Exists or not.
  * ------------------------------------------------------------------------------
  */
-function nano_email_exists( $email ) {
-    $emails = nano_email_lists(); //all the emails
+function nano_ed_email_exists( $email ) {
+    $emails = nano_ed_email_lists(); //all the emails
 
 	if( in_array( $email, $emails ) )
 		return true;
@@ -318,12 +354,13 @@ function nano_email_exists( $email ) {
  * @return array                   Emails that are stored.
  * ------------------------------------------------------------------------------
  */
-function nano_email_lists( $posts_per_page = null, $offset = null ) {
+function nano_ed_email_lists( $posts_per_page = null, $offset = null ) {
     global $wpdb;
+    $table = $wpdb->prefix .'download_email';
     
     $_email_data = wp_cache_get( 'nano_ed_email_storage' );
     if ( false === $_email_data ) {
-        $query = "SELECT option_value FROM {$wpdb->options} WHERE option_name LIKE 'nanoedmail_%' GROUP BY option_id";
+        $query = "SELECT email FROM $table";
 
         if( $posts_per_page ) {
             $query .= " LIMIT {$posts_per_page}";
@@ -338,13 +375,14 @@ function nano_email_lists( $posts_per_page = null, $offset = null ) {
     }
 
     $emails = array();
-    foreach( $_email_data as $_email ) {
-        $emails[] = $_email->option_value;
-    }
+    if( $_email_data ) :
+        foreach( $_email_data as $_email ) :
+            $emails[] = $_email;
+        endforeach;
+    endif;
 
     return $emails;
 }
-
 
 /**
  * Get the MIME Type.
@@ -553,6 +591,7 @@ function get_mime_type( $filename ) {
 
 /**
  * Making noReply Email from Host URL.
+ * @author  Sisir Kanti Adhikari
  * @return string noreply@yourdomain.dom
  * ------------------------------------------------------------------------------
  */

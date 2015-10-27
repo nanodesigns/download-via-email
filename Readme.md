@@ -1,4 +1,4 @@
-<img src="assets/banner-1544x500.png" alt="Download via Email - WordPress Plugin"/>
+<img src="assets/banner-772x250.png" alt="Download via Email - WordPress Plugin by nanodesigns"/>
 # Download via Email
 Embed a form in your pages and posts that accept an email address in exchange for a file to download. The plugin is simpler, quicker, with minimal database usage, and completely in WordPress' way.
 

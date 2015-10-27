@@ -132,13 +132,13 @@ function email_downloads_options_page_callback() { ?>
 	$posts_per_page = get_option( 'posts_per_page' );
 	$offset = ( $pagenum - 1 ) * $posts_per_page;
 
-	$get_emails = nano_email_lists( $posts_per_page, $offset );
+	$get_emails = nano_ed_email_lists( $posts_per_page, $offset );
 
 	if( $get_emails ) :
 		$_counter = 0; ?>
 			<hr>
 
-			<h2><?php _e( 'Stored Email Addresses', 'email-downloads' ); ?></h2>
+			<h2><?php _e( 'Stored Email Address', 'email-downloads' ); ?></h2>
 			<table class="wp-list-table widefat fixed striped">
 				<thead>
 					<tr>
@@ -153,7 +153,7 @@ function email_downloads_options_page_callback() { ?>
 					?>				
 					<tr>
 						<td><?php echo $_counter; ?></td>
-						<td><?php echo $emails; ?></td>
+						<td><?php echo $emails->email; ?></td>
 					</tr>
 				<?php
 				endforeach;
@@ -162,14 +162,15 @@ function email_downloads_options_page_callback() { ?>
 			</table>
 			<?php
 			global $wpdb;
-			$total = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE 'nanoedmail_%'" );
+			$table = $wpdb->prefix .'download_email';
+			$total = $wpdb->get_var( "SELECT COUNT(*) FROM {$table} GROUP BY id" );
 			$num_of_pages = ceil( $total / $posts_per_page );
 
 			$page_links = paginate_links( array(
 			    'base'		=> add_query_arg( 'pagenum', '%#%' ),
 			    'format'	=> '',
-			    'prev_text'	=> __( '&laquo;', 'aag' ),
-			    'next_text'	=> __( '&raquo;', 'aag' ),
+			    'prev_text'	=> '&laquo;',
+			    'next_text'	=> '&raquo;',
 			    'total'		=> $num_of_pages,
 			    'current'	=> $pagenum
 			) );
