@@ -65,7 +65,7 @@ Default privilege to the admin menu page is 'administrator'. But there is a filt
 == Changelog ==
 
 = 1.0.1 =
-* New database `download_via_email` is added to sort stored email correctly
+* New database `download_email` is added to sort stored email correctly
 
 = 1.0.0 =
 * A rudimentary WordPress plugin to enable sending download link to email address
