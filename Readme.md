@@ -4,7 +4,7 @@ Embed a form in your pages and posts that accept an email address in exchange fo
 
 ----
 
-[**DOWNLOAD**](https://github.com/nanodesigns/download-via-email/releases/tag/1.0.0) *stable version 1.0.0*
+[**DOWNLOAD**](https://github.com/nanodesigns/download-via-email/releases/download/1.0.1/download-via-email.zip) *stable version 1.0.1*
 
 ----
 
@@ -53,6 +53,10 @@ The email addresses are saved in database, and is visible in the admin menu page
 
 Yes, the plugin deletes all its data on uninstallation
 
+### What's the default privilege using the plugin?
+
+Default privilege to the admin menu page is 'administrator'. But there is a filter hook `nano_ed_role`, with this you can add a filter to change the role anytime. :)
+
 ## Screenshots
 
 ![Download via Email - how it will look like at the front end](assets/screenshot-1.png "Download via Email - how it will look like at the front end")<br>
@@ -70,6 +74,7 @@ _Download via Email - the admin panel settings page_
 * A rudimentary WordPress plugin to enable sending download link to email address
 * Completely in WordPress database schema - no other table, no column
 * Email storage in `options` table
+* Deletion of all the data on uninstallation of the plugin
 
 __________________
 Designed &amp; Developed by [**nano**designs](http://nanodesignsbd.com/)

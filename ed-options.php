@@ -30,8 +30,8 @@ function email_downloads_add_admin_menu() {
 
 		/**
 		 * Filter the admin menu access.
-		 *
-		 * Default access privilege: administrator
+		 * Filter hook: 'nano_ed_role'
+		 * Default access privilege: administrator.
 		 */
 		apply_filters( 'nano_ed_role', 'manage_options' ),
 		'email_downloads',

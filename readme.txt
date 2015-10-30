@@ -53,6 +53,10 @@ The email addresses are saved in database, and is visible in the admin menu page
 
 Yes, the plugin deletes all its data on uninstallation
 
+= What's the default privilege using the plugin? =
+
+Default privilege to the admin menu page is 'administrator'. But there is a filter hook <code>nano_ed_role</code>, with this you can add a filter to change the role anytime. :)
+
 == Screenshots ==
 
 1. **Download via Email** - how it will look like at the front end
@@ -77,3 +81,4 @@ New database `download_via_email` is added to sort stored email correctly
 A rudimentary WordPress plugin to enable sending download link to email address
 Completely in WordPress database schema - no other table, no column
 Email storage in `options` table
+Deletion of all the data on uninstallation of the plugin

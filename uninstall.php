@@ -21,15 +21,10 @@ if ( is_multisite() && get_site_option( $option_name ) )
 
 
 /**
- * Delete all the saved email addresses
+ * Delete all the saved email addresses in our custom database.
+ * @since  1.0.1
  * ------------------------------------------------------------------------------
  */
 global $wpdb;
-$delete_saved_emails = $wpdb->query( 
-							$wpdb->prepare( 
-								"DELETE FROM $wpdb->options
-								 WHERE option_name LIKE %s
-								",
-							        'nanoedmail_%' 
-						        )
-						);
+$table = $wpdb->prefix .'download_email';
+$wpdb->query("DROP TABLE IF EXISTS $table");
