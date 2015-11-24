@@ -4,11 +4,11 @@ Embed a form in your pages and posts that accept an email address in exchange fo
 
 ----
 
-[**DOWNLOAD**](https://github.com/nanodesigns/download-via-email/releases/download/1.0.1/download-via-email.zip) *stable version 1.0.1*
+[**DOWNLOAD**](https://github.com/nanodesigns/download-via-email/releases/download/1.0.2/download-via-email.zip) *stable version 1.0.2*
 
 ----
 
-Version 1.0.1<br>
+Version 1.0.2<br>
 **Developers:** Mayeenul Islam ([@mayeenulislam](http://twitter.com/mayeenulislam)), Sisir Kanti Adhikari ([@prionkor](http://twitter.com/prionkor))<br>
 **Tested up to:** 4.3.1<br>
 **License:** [GPLv2](http://www.gnu.org/licenses/gpl-2.0.html) or later
@@ -66,6 +66,9 @@ _Download via Email - how it will look like at the front end_
 _Download via Email - the admin panel settings page_
 
 ## Changelog
+
+### 1.0.2
+* A function conflicting with WordPress core was fixed
 
 ### 1.0.1
 * New database `download_email` is added to sort stored email correctly

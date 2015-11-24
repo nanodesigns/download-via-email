@@ -3,7 +3,7 @@ Contributors: wzislam, prionkor
 Tags: email, downloads, email before download, download link to email, download via email
 Requires at least: 3.0
 Tested up to: 4.3.1
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -64,6 +64,9 @@ Default privilege to the admin menu page is 'administrator'. But there is a filt
 
 == Changelog ==
 
+= 1.0.2 =
+* A function conflicting with WordPress core was fixed
+
 = 1.0.1 =
 * New database `download_email` is added to sort stored email correctly
 
@@ -73,6 +76,9 @@ Default privilege to the admin menu page is 'administrator'. But there is a filt
 * Email storage in `options` table
 
 == Upgrade Notice ==
+
+= 1.0.2 =
+A function conflicting with WordPress core was fixed
 
 = 1.0.1 =
 New database `download_via_email` is added to sort stored email correctly
