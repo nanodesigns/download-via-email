@@ -194,7 +194,7 @@ function nanodesigns_ed_let_the_user_download() {
             //header('Expires: 0');
             header('Pragma: public');
             header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-            header('Content-Type: '. get_mime_type( $file ));
+            header('Content-Type: '. nano_ed_get_mime_type( $file ));
             header('Content-Description: File Transfer');
             header('Content-Disposition: attachment; filename="'. $file .'"');
             header('Content-Length: '. @filesize( $file ));
@@ -392,7 +392,7 @@ function nano_ed_email_lists( $posts_per_page = null, $offset = null ) {
  * @return string           File MIME type.
  * ------------------------------------------------------------------------------
  */
-function get_mime_type( $filename ) {
+function nano_ed_get_mime_type( $filename ) {
     $extension = pathinfo( $filename, PATHINFO_EXTENSION );
 
     $mime_types = array("323" => "text/h323",
